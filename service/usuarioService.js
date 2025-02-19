@@ -1,22 +1,58 @@
-const {adicionarUsuario, buscarUsuarioPorId, listarUsuarioNoBanco, atualizarUsuario, deletarUsuario} = require('../repository/usuarioRepository');
- const Usuario = require('../models/usuarioModel');
+const { adicionarUsuario, buscarUsuarioPorId, listarUsuariosNoBanco, atualizarUsuario, deletarUsuario } = require('../repository/usuarioRepository');
+const Usuario = require('../models/usuarioModel'); 
 
-async function criarUsuario(nome,data_criacao) {
-    let usuario = new Usuario (null, nome, data_criacao);
-    try{
+async function criarUsuario(nome, data_criacao) {
+    let usuario = new Usuario(null, nome, data_criacao);
+
+    try {
         await adicionarUsuario(usuario);
     } catch (error) {
-        console.error("Erro ao adicionar usuario ao banco de dados", error.message);
+        console.error("Erro ao adicionar usuário ao banco de dados:", error.message);
         throw error;
     }
 }
 
-async function buscarPorId(id){
-    try{
+async function buscarPorId(id) {
+    try {
         return await buscarUsuarioPorId(id);
-    } catch (error){
-        console.error("Erro ao buscar usuario no banco de dados", error.message);
+    } catch (error) {
+        console.error("Erro ao buscar usuário no banco de dados:", error.message);
         throw error;
     }
 }
 
+async function listarUsuarios() {
+    try {
+        return await listarUsuariosNoBanco();
+    } catch (error) {
+        console.error("Erro ao listar usuários:", error.message);
+        throw error;
+    }
+}
+
+async function editarUsuario ( id, nome, data_criacao ){
+    
+    let usuario = new Usuario(null, nome, data_criacao);
+    usuario.id = id;
+
+    try {
+        await atualizarUsuario( usuario ); 
+    } catch (error) {
+        console.error ( "Erro ao atualizar usuário: ", error.message);
+        throw error;
+    }
+    
+}
+
+async function removerUsuario ( id ){
+
+    try {
+        await deletarUsuario( id );
+    } catch ( error ){
+        console.error ( "Erro ao remover usuário: ", error.message);
+        throw error;
+    }
+
+}
+
+module.exports = { criarUsuario, buscarPorId, listarUsuarios, editarUsuario, removerUsuario };

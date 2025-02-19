@@ -1,4 +1,4 @@
-class Imagem{
+class imagemModel{
     constructor ( id = null, referencia, data_criacao, titulo){
         this.id = id;
         this.referencia = referencia;
@@ -6,3 +6,5 @@ class Imagem{
         this.titulo = titulo;
     };
 };
+
+module.exports = imagemModel;
