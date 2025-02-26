@@ -1,14 +1,14 @@
 const { con } = require('./db');
 const UUID = require('uuid');
+const AWS = require('aws-sdk');
 const aws_bucketName = 'bucketmi74';
 let s3;
 let fs = require('fs');
+const path = require('path');
 
 const conectarAws = () => {
     
     console.log('Conectando ao AWS...');
-
-    const AWS = require('aws-sdk');
 
     // Configuração das credenciais AWS
     AWS.config.update({
@@ -23,7 +23,7 @@ const conectarAws = () => {
 const criarImagemNoBanco = ( idUser) => {
     return new Promise ((resolve, reject) => {
         const ref = UUID.v4();
-        const sql = "INSERT INTO tb_imagem_aws (ref, id_user) VALUES (?, ? )";
+        const sql = "INSERT INTO tb_imagem_aws (referencia, idUsuario) VALUES (?, ? )";
         con.query(sql, [ref, idUser], (err, results) => {
             if (err) {
                 reject(new Error("Erro ao criar imagem: " + err.message));
@@ -35,22 +35,6 @@ const criarImagemNoBanco = ( idUser) => {
     });
 }
 
-const pegarImagemNoBanco = (id) => {
-    return new Promise ((resolve, reject) => {
-        const sql = "SELECT * FROM tb_imagem_aws WHERE id = ?";
-        con.query(sql, [id], (err, results) => {
-            if (err) {
-                reject(new Error("Erro ao buscar imagem: " + err.message));
-            } else {
-                resolve(results[0]);
-            }
-        });
-    });
-}
-
-const baixarImagem = ( arquivoNome ) => {
-    pegarNoAws(arquivoNome);
-}
 
 const mandarParaOAws = ( ref ) => {
 
@@ -77,7 +61,7 @@ const mandarParaOAws = ( ref ) => {
         });
     };
 
-    uploadFile ( 'C:/Users/gustavo_stinghen/Documents/Cloud/ModulosNodeAPI/IMAGENS/starwars.jpg', aws_bucketName, ref );
+    uploadFile ( 'C:/Users/camilly_chelest/Downloads/CSMRR/imagem/luansantana.jpg', aws_bucketName, ref );
 }
 
 const pegarNoAws = ( arquivoNome ) => {
@@ -86,26 +70,33 @@ const pegarNoAws = ( arquivoNome ) => {
         conectarAws();
     }
 
-    const downloadFile = (bucketName, keyName, downloadPath) => {
+    const downloadFile = (bucketName, keyName ) => {
         
         const params = {
           Bucket: bucketName,
           Key: keyName
         };
       
-        const file = fs.createWriteStream(downloadPath);
+        s3.getObject(params).promise()
+          .then(data => {
+            
+            const downloadsPath = path.join(require('os').homedir(), 'Downloads');
+            const filePath = path.join(downloadsPath, arquivoNome);
+            fs.writeFileSync(filePath, data.Body);
+            
+            console.log('Arquivo baixado com sucesso:', filePath);
+
+          })
+          .catch(err => {
+            console.error('Erro ao baixar o arquivo:', err);
+          });
       
-        s3.getObject(params).createReadStream().pipe(file);
-      
-        file.on('close', () => {
-          console.log('Arquivo baixado com sucesso:', downloadPath);
-        });
       };
       
     // Exemplo de uso
-    downloadFile( aws_bucketName, arquivoNome, 'C:/Users/gustavo_stinghen/Downloads');
+    return downloadFile( aws_bucketName, arquivoNome );
 
 }
 
 
-module.exports = { criarImagemNoBanco, pegarImagemNoBanco, baixarImagem };
+module.exports = { criarImagemNoBanco, pegarNoAws };

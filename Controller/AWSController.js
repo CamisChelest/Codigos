@@ -1,33 +1,24 @@
-const { criar, buscarPorId, pegarDaAws } = require("../service/AWSService");
+const { criar, pegarDaAws } = require("../service/AWSService");
 
 const criarImagem = async(req, res) => {
-    const {idUser} = req.body;
+    const {idUsuario} = req.body;
     try{
-        await criar(idUser);
-        req.status(200).json("Imagem adicionada");
+        await criar(idUsuario);
+        res.status(200).json("Imagem adicionada");
     } catch (error){
-        req.status(400).json({error: error.message});
-    };
-};
-
-const pegarImagem  = async(req, res) => {
-    const {id} = req.params;
-    try{
-        const imagem = await buscarPorId(id);
-        req.status(200).json(imagem);
-    } catch(error){
-        req.status(400).json({error: error.message});
+        res.status(400).json({error: error.message});
     };
 };
 
 const pegarImagemAWS = async(req, res) => {
-    const {referencia, arquivoNome} = req.body;
+    const { arquivoNome } = req.params;
+    console.log(arquivoNome);
     try{
-        const imagem = await pegarDaAws(referencia, arquivoNome);
-        req.status(200).json(referencia, arquivoNome);
+        const imagem = await pegarDaAws( arquivoNome);
+        res.status(200).json( arquivoNome);
     } catch (error){
-        req.status(400).json({error: error.message});
+        res.status(400).json({error: error.message});
     };
 };
 
-module.exports(criarImagem, pegarImagem, pegarImagemAWS);
+module.exports = { criarImagem, pegarImagemAWS };

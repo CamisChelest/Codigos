@@ -1,4 +1,4 @@
-const { criarImagemNoBanco, pegarImagemNoBanco, baixarImagem } = require("../repository/AWSRepository");
+const { criarImagemNoBanco, pegarNoAws } = require("../repository/AWSRepository");
 
 async function criar(idUser){
     try{
@@ -9,20 +9,13 @@ async function criar(idUser){
     };
 };
 
-async function buscarPorId(referencia){
+async function pegarDaAws( arquivoNome){
     try{
-        return await pegarImagemNoBanco(referencia);
-    } catch (error){
-        console.error("Erro ao tentar pegar imagem do Banco", error.message);
-        throw error;
-    };
-};
-
-async function pegarDaAws(referencia, arquivoNome){
-    try{
-        return await baixarImagem(referencia, arquivoNome);
+        return await pegarNoAws(arquivoNome);
     } catch (error){
         console.error("Erro ao tentar abaixar a imagem", error.message);
         throw error;
     };
 };
+
+module.exports = { criar, pegarDaAws}
