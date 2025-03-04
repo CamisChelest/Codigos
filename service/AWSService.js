@@ -1,3 +1,4 @@
+//camada intermediária, chama o Repository
 const { criarImagemNoBanco, pegarNoAws } = require("../repository/AWSRepository");
 
 async function criar(idUser){
